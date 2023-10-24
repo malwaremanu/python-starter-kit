@@ -1,5 +1,5 @@
 from datetime import date
-from flask import Flask, url_for, render_template, request, session
+from flask import Flask, url_for, render_template, request, session, jsonify
 from flask_session import Session
 from functools import wraps
 
@@ -78,6 +78,7 @@ def callback():
     data.update(get_authorized_data(kinde_client))
     session["user"] = data.get("id")
     user_clients[data.get("id")] = kinde_client
+    print(user_clients)
     return app.redirect(url_for("index"))
 
 
@@ -102,6 +103,16 @@ def get_details():
     return render_template(template, **data)
 
 
+@app.route("/sdetails/<id>")
+def get_specific_details(id):
+    template = "logged_out.html"
+    kinde_client = user_clients.get(id)
+    data = {"current_year": date.today().year}
+    data.update(get_authorized_data(kinde_client))
+    data["access_token"] = kinde_client.configuration.access_token        
+    return jsonify(**data)
+
+
 @app.route("/helpers")
 def get_helper_functions():
     template = "logged_out.html"
@@ -112,9 +123,11 @@ def get_helper_functions():
         data["claim"] = kinde_client.get_claim("iss")
         data["organization"] = kinde_client.get_organization()
         data["user_organizations"] = kinde_client.get_user_organizations()
-        data["flag"] = kinde_client.get_flag("theme")
-        data["bool_flag"] = kinde_client.get_boolean_flag("is_dark_mode")
-        data["str_flag"] = kinde_client.get_string_flag("theme")
-        data["int_flag"] = kinde_client.get_integer_flag("competitions_limit")
+        data['permissions'] = kinde_client.get_permissions()
+        # data["flag"] = kinde_client.get_flag("theme")
+        # data["bool_flag"] = kinde_client.get_boolean_flag("is_dark_mode")
+        # data["str_flag"] = kinde_client.get_string_flag("theme")
+        # data["int_flag"] = kinde_client.get_integer_flag("competitions_limit")
         template = "helpers.html"
+    return jsonify(**data)
     return render_template(template, **data)
