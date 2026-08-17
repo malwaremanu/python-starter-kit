@@ -1,0 +1,5 @@
+fastapi
+kinde-python-sdk==1.2.1
+uvicorn[standard]
+pyjwt
+requests

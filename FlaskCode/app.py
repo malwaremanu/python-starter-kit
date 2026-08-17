@@ -27,6 +27,7 @@ if app.config["GRANT_TYPE"] == GrantType.AUTHORIZATION_CODE_WITH_PKCE:
 kinde_client = KindeApiClient(**kinde_api_client_params)
 user_clients = {}
 
+
 def get_authorized_data(kinde_client):
     user = kinde_client.get_user_details()
     return {
@@ -73,7 +74,7 @@ def register():
 
 @app.route("/api/auth/kinde_callback")
 def callback():
-    kinde_client.fetch_token(authorization_response=request.url)
+    print(kinde_client.fetch_token(authorization_response=request.url))
     data = {"current_year": date.today().year}
     data.update(get_authorized_data(kinde_client))
     session["user"] = data.get("id")
